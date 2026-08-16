@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PharmaMate Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            background: white;
+            width: 420px;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background: #e8f3f0;
+            color: #222;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .menu a:hover {
+            background: #d4e9e4;
+        }
+
+        .logout {
+            margin-top: 20px;
+        }
+
+        .logout a {
+            display: inline-block;
+            background: #333;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .logout a:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <h1>Welcome to PharmaMate</h1>
+
+        <p class="subtitle">
+            Your Smart Pharmacy Management System
+        </p>
+
+        <div class="menu">
+
+            <!-- IMPORTANT: Opens MedicinesServlet -->
+            <a href="medicines">Medicines</a>
+
+            <a href="inventory">Inventory</a>
+
+            <a href="profile">Profile</a>
+
+        </div>
+
+        <div class="logout">
+            <a href="index.html">Logout</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
