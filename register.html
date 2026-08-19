@@ -1,162 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PharmaMate - Register</title>
+
     <style>
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: #e5e7eb;
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5ff, #f4fbff);
+
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
         }
 
-        .register-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 35px 30px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        .container {
+            width: 430px;
+            background: white;
+            padding: 40px 45px;
+            border-radius: 18px;
+
+            box-shadow: 0 10px 35px rgba(0, 80, 120, 0.15);
+
             text-align: center;
         }
 
-        .icon {
-            font-size: 32px;
-            margin-bottom: 5px;
-            display: inline-block;
-        }
-
         h1 {
-            font-size: 24px;
-            color: #1f2937;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .subtitle {
-            font-size: 11px;
-            color: #4b5563;
-            line-height: 1.4;
-            margin-bottom: 20px;
+            margin: 5px 0;
+            color: #075985;
+            font-size: 32px;
         }
 
         h2 {
-            font-size: 18px;
-            color: #111827;
-            margin-bottom: 20px;
-            font-weight: 600;
+            margin: 8px 0 28px;
+            color: #475569;
+            font-size: 17px;
+            font-weight: normal;
         }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
+        h3 {
+            color: #0f172a;
+            margin-bottom: 25px;
+            font-size: 22px;
         }
 
-        .input-group label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #111827;
-            text-align: left;
-            width: 38%;
-        }
-
-        .input-group input {
-            width: 60%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-            color: #374151;
-            background-color: #f9fafb;
-        }
-
-        .input-group input:focus {
-            border-color: #2563eb;
-            background-color: #ffffff;
-        }
-
-        .btn-register {
+        table {
             width: 100%;
-            padding: 10px;
-            background-color: #2563eb;
-            color: #ffffff;
+        }
+
+        td {
+            padding: 10px 5px;
+        }
+
+        label {
+            color: #334155;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="email"]:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        .otp-button {
+            margin-top: 20px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+
+            background: #0284c7;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
             cursor: pointer;
-            margin-top: 10px;
-            margin-bottom: 18px;
-            transition: background-color 0.2s ease;
         }
 
-        .btn-register:hover {
-            background-color: #1d4ed8;
+        input[type="submit"]:hover {
+            background: #0369a1;
         }
 
-        .footer-link {
-            font-size: 12px;
-            color: #4b5563;
+        .back-login {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
         }
 
-        .footer-link a {
-            color: #2563eb;
+        .back-login a {
+            color: #0284c7;
+            font-weight: bold;
             text-decoration: none;
-            font-weight: 600;
         }
 
-        .footer-link a:hover {
+        .back-login a:hover {
             text-decoration: underline;
-        }
-
-        .tagline {
-            font-size: 10px;
-            color: #6b7280;
-            margin-top: 15px;
         }
     </style>
 </head>
+
 <body>
 
-    <div class="register-card">
-        <div class="icon">💊</div>
+    <div class="container">
+
         <h1>PharmaMate</h1>
-        <p class="subtitle">Medicine Inventory & Expiry Management<br>System</p>
-        
-        <h2>Create Your Account</h2>
 
-        <form action="RegisterServlet" method="POST">
-            <div class="input-group">
-                <label for="userId">Enter ID:</label>
-                <input type="text" id="userId" name="userId" placeholder="Enter your ID" required>
+        <h2>Medicine Inventory &amp; Expiry Management System</h2>
+
+        <h3>Create Your Account</h3>
+
+        <form action="#" method="post">
+
+            <table>
+
+                <tr>
+                    <td>
+                        <label>Enter Email:</label>
+                    </td>
+
+                    <td>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </td>
+                </tr>
+
+            </table>
+
+            <div class="otp-button">
+                <input type="submit" value="Send OTP">
             </div>
 
-            <div class="input-group">
-                <label for="password">Enter Password:</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            </div>
-
-            <button type="submit" class="btn-register">Register</button>
         </form>
 
-        <p class="footer-link">
-            Already have an account? <a href="login.html">Login here</a>
-        </p>
+        <div class="back-login">
+            Already have an account?
+            <a href="index.html">Login here</a>
+        </div>
 
-        <p class="tagline">Secure • Simple • Smart Medicine Management</p>
     </div>
 
 </body>
