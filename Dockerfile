@@ -10,7 +10,7 @@ RUN mvn -q dependency:copy-dependencies \
     -DoutputDirectory=WEB-INF/lib
 
 # Compile the existing Java source files
-RUN mvn -q compile
+RUN mvn -q clean compile
 
 
 # ---------- RUNTIME STAGE ----------
