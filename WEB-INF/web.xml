@@ -71,5 +71,13 @@
     <servlet-name>InventoryServlet</servlet-name>
     <url-pattern>/inventory</url-pattern>
 </servlet-mapping>
+<servlet>
+    <servlet-name>SendOTPServlet</servlet-name>
+    <servlet-class>SendOTPServlet</servlet-class>
+</servlet>
 
+<servlet-mapping>
+    <servlet-name>SendOTPServlet</servlet-name>
+    <url-pattern>/sendOTP</url-pattern>
+</servlet-mapping>
 </web-app>
