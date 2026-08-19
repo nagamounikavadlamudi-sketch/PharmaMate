@@ -8,7 +8,9 @@ COPY . .
 # Download Maven dependencies into WEB-INF/lib
 RUN mvn -q dependency:copy-dependencies \
     -DoutputDirectory=WEB-INF/lib
-
+# Compile Java servlet source files
+RUN javac -cp "WEB-INF/lib/*:/usr/local/tomcat/lib/*" \
+    -d WEB-INF/classes WEB-INF/classes/*.java
 # ---------- RUNTIME STAGE ----------
 FROM tomcat:9.0-jdk17-corretto
 
