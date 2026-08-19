@@ -45,11 +45,8 @@
 
     <build>
 
-        <!-- Your existing Java source files are here -->
-        <sourceDirectory>${project.basedir}/WEB-INF/classes</sourceDirectory>
-
-        <!-- Keep compiled .class files in the existing location -->
-        <outputDirectory>${project.basedir}/WEB-INF/classes</outputDirectory>
+       <sourceDirectory>${project.basedir}/WEB-INF/classes</sourceDirectory>
+<outputDirectory>${project.build.directory}/classes</outputDirectory>
 
         <plugins>
 
