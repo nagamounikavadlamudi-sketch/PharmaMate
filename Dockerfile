@@ -11,7 +11,7 @@ RUN mvn -q dependency:copy-dependencies \
 
 # Compile the existing Java source files
 RUN mvn -q clean compile
-
+RUN cp -r target/classes/* /usr/local/tomcat/webapps/ROOT/WEB-INF/classes/
 
 # ---------- RUNTIME STAGE ----------
 FROM tomcat:9.0-jdk17-corretto
