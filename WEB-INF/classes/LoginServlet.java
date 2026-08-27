@@ -4,7 +4,10 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class LoginServlet extends HttpServlet {
-
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    response.sendRedirect(request.getContextPath() + "/index.html");
+}
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
                           throws ServletException, IOException {

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>PharmaMate - Login</title>
+    <title>PharmaMate - Register</title>
 
     <style>
         * {
@@ -13,7 +13,6 @@
             margin: 0;
             min-height: 100vh;
             font-family: Arial, sans-serif;
-
             background: linear-gradient(135deg, #e8f5ff, #f4fbff);
 
             display: flex;
@@ -30,11 +29,6 @@
             box-shadow: 0 10px 35px rgba(0, 80, 120, 0.15);
 
             text-align: center;
-        }
-
-        .logo {
-            font-size: 42px;
-            margin-bottom: 5px;
         }
 
         h1 {
@@ -70,8 +64,7 @@
             font-size: 14px;
         }
 
-        input[type="text"],
-        input[type="password"] {
+        input[type="email"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #cbd5e1;
@@ -80,13 +73,12 @@
             outline: none;
         }
 
-        input[type="text"]:focus,
-        input[type="password"]:focus {
+        input[type="email"]:focus {
             border-color: #0284c7;
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
         }
 
-        .login {
+        .otp-button {
             margin-top: 20px;
         }
 
@@ -109,26 +101,21 @@
             background: #0369a1;
         }
 
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
+        .back-login {
+            margin-top: 20px;
+            font-size: 14px;
             color: #64748b;
         }
-        .register-link {
-    margin-top: 18px;
-    font-size: 14px;
-    color: #64748b;
-}
 
-.register-link a {
-    color: #0284c7;
-    font-weight: bold;
-    text-decoration: none;
-}
+        .back-login a {
+            color: #0284c7;
+            font-weight: bold;
+            text-decoration: none;
+        }
 
-.register-link a:hover {
-    text-decoration: underline;
-}
+        .back-login a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -136,61 +123,42 @@
 
     <div class="container">
 
-        <div class="logo">💊</div>
-
         <h1>PharmaMate</h1>
 
-        <h2>
-            Medicine Inventory &amp; Expiry Management System
-        </h2>
+        <h2>Medicine Inventory &amp; Expiry Management System</h2>
 
-        <h3>Login</h3>
+        <h3>Create Your Account</h3>
 
-        <form action="/login" method="post">
+        <form action="sendOTP" method="post">
 
             <table>
 
                 <tr>
                     <td>
-                        <label>Enter ID:</label>
+                        <label>Enter Email:</label>
                     </td>
 
                     <td>
                         <input
-                            type="text"
-                            name="id"
-                            placeholder="Enter your ID"
-                        >
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <label>Enter Password:</label>
-                    </td>
-
-                    <td>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Enter your password"
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            required
                         >
                     </td>
                 </tr>
 
             </table>
 
-            <div class="login">
-                <input type="submit" value="Login">
+            <div class="otp-button">
+                <input type="submit" value="Send OTP">
             </div>
 
         </form>
-<p class="register-link">
-    Don't have an account?
-    <a href="register.html">Register here</a>
-</p>
-        <div class="footer">
-            Secure • Simple • Smart Medicine Management
+
+        <div class="back-login">
+            Already have an account?
+            <a href="index.html">Login here</a>
         </div>
 
     </div>
