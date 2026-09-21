@@ -1,4 +1,5 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 public class DBConnection {
 
@@ -6,9 +7,9 @@ public class DBConnection {
 
         Class.forName("com.mysql.cj.jdbc.Driver");
 
-        String url = System.getenv("DB_URL");
-        String user = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
+        String url = "jdbc:mysql://localhost:3306/pharmamate";
+        String user = "root";
+        String password = "Mounika@02";
 
         return DriverManager.getConnection(url, user, password);
     }

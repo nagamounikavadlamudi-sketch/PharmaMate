@@ -4,23 +4,23 @@ import javax.servlet.http.*;
 
 public class ProfileServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
-
         HttpSession session = request.getSession(false);
 
+        // Security check
         if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.html");
+            response.sendRedirect(request.getContextPath() + "/index.html");
             return;
         }
 
-        String userId = (String) session.getAttribute("userId");
-        String name = (String) session.getAttribute("name");
-        String role = (String) session.getAttribute("role");
+        String username = (String) session.getAttribute("username");
+        if (username == null) username = "Pharma User";
+        
         String email = (String) session.getAttribute("email");
+        if (email == null) email = "Not Available";
 
         PrintWriter out = response.getWriter();
 
@@ -31,27 +31,28 @@ public class ProfileServlet extends HttpServlet {
         out.println("<title>PharmaMate - Profile</title>");
 
         out.println("<style>");
-        out.println("body{font-family:Arial;background:#f4f7f6;padding:40px;}");
-        out.println(".profile{width:500px;margin:auto;background:white;padding:30px;border-radius:12px;box-shadow:0 4px 12px #ccc;}");
-        out.println("h1{text-align:center;}");
-        out.println(".info{padding:15px;border-bottom:1px solid #ddd;font-size:18px;}");
-        out.println(".label{font-weight:bold;}");
-        out.println(".back{display:block;text-align:center;margin-top:25px;text-decoration:none;color:#333;}");
+        out.println("body { font-family: Arial, sans-serif; background: #e8f5ff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }");
+        out.println(".profile-card { background: white; padding: 40px 50px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 400px; }");
+        out.println("h2 { text-align: center; color: #555; font-size: 26px; margin-bottom: 30px; }");
+        out.println(".field { border-bottom: 1px dashed #ccc; padding: 18px 0; font-size: 16px; color: #333; }");
+        out.println(".field:last-of-type { border-bottom: none; }");
+        out.println(".field b { font-weight: bold; color: #111; display: inline-block; width: 100px; }");
+        out.println(".back-link { display: block; text-align: center; margin-top: 30px; text-decoration: none; color: #666; font-size: 14px; }");
+        out.println(".back-link:hover { color: #333; text-decoration: underline; }");
         out.println("</style>");
 
         out.println("</head>");
         out.println("<body>");
 
-        out.println("<div class='profile'>");
+        out.println("<div class='profile-card'>");
+        out.println("<h2>Profile</h2>");
 
-        out.println("<h1>👤 Profile</h1>");
+        // Displaying only the clean, relevant user details
+        out.println("<div class='field'><b>Username:</b> " + username + "</div>");
+        out.println("<div class='field'><b>Role:</b> Pharmacy Employee</div>");
+        out.println("<div class='field'><b>Email:</b> " + email + "</div>");
 
-        out.println("<div class='info'><span class='label'>Name:</span> " + name + "</div>");
-        out.println("<div class='info'><span class='label'>User ID:</span> " + userId + "</div>");
-        out.println("<div class='info'><span class='label'>Role:</span> " + role + "</div>");
-        out.println("<div class='info'><span class='label'>Email:</span> " + email + "</div>");
-
-        out.println("<a href='dashboard.html' class='back'> Back to Dashboard</a>");
+        out.println("<a href='dashboard.html' class='back-link'>&larr; Back to Dashboard</a>");
 
         out.println("</div>");
         out.println("</body>");
