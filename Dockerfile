@@ -6,11 +6,8 @@ RUN sed -i 's/port="8005"/port="-1"/' /usr/local/tomcat/conf/server.xml
 # Clear default ROOT directory
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
 
-# Copy your project files into ROOT
+# Copy your local project files (including your compiled .class files) into ROOT
 COPY . /usr/local/tomcat/webapps/ROOT/
-
-# CRITICAL STEP: Recompile Java files so the environment variables are actually read
-RUN find /usr/local/tomcat/webapps/ROOT/WEB-INF/classes -name "*.java" -exec javac -cp "/usr/local/tomcat/lib/*:/usr/local/tomcat/webapps/ROOT/WEB-INF/lib/*" {} +
 
 EXPOSE 8080
 
