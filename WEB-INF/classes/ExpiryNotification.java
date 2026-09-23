@@ -35,7 +35,7 @@ public class ExpiryNotification extends HttpServlet {
         out.println("a{display:block;text-align:center;margin-top:20px;color:#0d6efd;font-weight:bold;}");
         out.println("</style></head><body>");
 
-        out.println("<h2>Medicine Expiry Notifications</h2>");
+        out.println("<h2>PharmaMate Expiry Notifications</h2>");
 
         Connection con = null;
         PreparedStatement ps = null;
