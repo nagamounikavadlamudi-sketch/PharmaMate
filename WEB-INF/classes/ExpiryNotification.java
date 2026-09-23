@@ -36,12 +36,22 @@ public class ExpiryNotification extends HttpServlet {
 
         out.println("<h2>PharmaMate Expiry Notifications</h2>");
 
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
         try {
-            con = DBConnection.getConnection();
+            Connection con = DBConnection.getConnection();
+            
+            // ==========================================
+            // SECRET RESET TRICK: Database history clear cheyadaniki
+            // URL lo ?reset=true ani isthe old data antha pothundi.
+            // ==========================================
+            if ("true".equals(request.getParameter("reset"))) {
+                try (Statement st = con.createStatement()) {
+                    st.execute("DROP TABLE IF EXISTS expiry_notifications");
+                    out.println("<h3 style='color:green;text-align:center;'>Database History Cleared! Refresh normal page to test again.</h3>");
+                    out.println("<a href='expiry'>Go to Notifications</a>");
+                    out.println("</body></html>");
+                    return;
+                }
+            }
             
             // 1. Fetch employee emails ONCE to save time
             List<String> employeeEmails = new ArrayList<>();
@@ -55,7 +65,7 @@ public class ExpiryNotification extends HttpServlet {
                 }
             }
 
-            // 2. Automatically create the table in the correct database
+            // 2. Automatically create the table
             String createTableSQL = "CREATE TABLE IF NOT EXISTS expiry_notifications ("
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "medicine_id INT NOT NULL, "
@@ -68,8 +78,8 @@ public class ExpiryNotification extends HttpServlet {
 
             // 3. Find expiring medicines
             String query = "SELECT id, name, expiry_date FROM medicines";
-            ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
 
             YearMonth currentMonth = YearMonth.now();
             LocalDate today = LocalDate.now();
@@ -121,20 +131,24 @@ public class ExpiryNotification extends HttpServlet {
 
                     if (!isAlreadySent(con, medicineId, notificationType)) {
                         
-                        // THIS IS THE FIX: Run email in a Background Thread!
+                        final int finalMedId = medicineId;
                         final String finalMedName = medicineName;
                         final String finalExpiry = expiry;
                         final String finalType = notificationType;
                         
+                        // FIX: Email successful ga send ayitheనే DB update avuthundi
                         new Thread(() -> {
                             try {
                                 sendExpiryEmail(employeeEmails, finalMedName, finalExpiry, finalType);
+                                // Email velthe, kotha connection theeskuni DB lo 'sent' ani rastundi
+                                try (Connection bgCon = DBConnection.getConnection()) {
+                                    markAsSent(bgCon, finalMedId, finalType);
+                                }
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                System.err.println("Mail delivery failed for " + finalMedName + ": " + e.getMessage());
                             }
                         }).start();
 
-                        markAsSent(con, medicineId, notificationType);
                         out.println("<p style='color:green;margin:5px 0 0 0;'>&#10003; Alert email is sending in the background.</p>");
                     } else {
                         out.println("<p style='color:gray;margin:5px 0 0 0;'>Notification already recorded as sent.</p>");
@@ -146,14 +160,14 @@ public class ExpiryNotification extends HttpServlet {
             if (!found) {
                 out.println("<div class='box' style='text-align:center;'>No expiry notifications at the moment!</div>");
             }
+            
+            rs.close();
+            ps.close();
+            con.close();
 
         } catch (Exception e) {
             out.println("<div class='box expired'><strong>System Error:</strong> " + e.getMessage() + "</div>");
             e.printStackTrace();
-        } finally {
-            if (rs != null) try { rs.close(); } catch (Exception ignored) {}
-            if (ps != null) try { ps.close(); } catch (Exception ignored) {}
-            if (con != null) try { con.close(); } catch (Exception ignored) {}
         }
 
         out.println("<a href='dashboard.html'>&larr; Back to Dashboard</a>");
@@ -181,7 +195,9 @@ public class ExpiryNotification extends HttpServlet {
     }
 
     private void sendExpiryEmail(List<String> employeeEmails, String medicineName, String expiry, String type) throws Exception {
-        if (employeeEmails.isEmpty()) return;
+        if (employeeEmails.isEmpty()) {
+            throw new Exception("No user emails found in the database to send to.");
+        }
 
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
