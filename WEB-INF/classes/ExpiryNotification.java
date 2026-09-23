@@ -13,8 +13,14 @@ import javax.mail.internet.*;
 
 public class ExpiryNotification extends HttpServlet {
 
+    // 1. Idi mee verified sender email (Brevo lo account create chesina email)
     private static final String SENDER_EMAIL = "nagamounikavadlamudi@gmail.com";
-    private static final String APP_PASSWORD = "mizimlhpwtonrwqw"; 
+    
+    // 2. Screenshot lo unna mee Brevo Login ID
+    private static final String BREVO_LOGIN_ID = "b9ede4001@smtp-brevo.com"; 
+    
+    // 3. Ippudu generate chesina kotha SMTP key ikkada paste cheyandi (Quotes madhyalo)
+    private static final String BREVO_SMTP_KEY = "xsmtpsib-c383c552291357d8550f4fe6302f31bea172ccf811aac393827b1929718dcd8f-SeycEO3PrtGqyvTc"; 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -182,20 +188,17 @@ public class ExpiryNotification extends HttpServlet {
         }
 
         Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com");
+        // BREVO PORT 2525 SETTINGS
+        properties.put("mail.smtp.host", "smtp-relay.brevo.com");
+        properties.put("mail.smtp.port", "2525");
         properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.port", "465");
-        properties.put("mail.smtp.ssl.enable", "true");
-        properties.put("mail.smtp.ssl.protocols", "TLSv1.2 TLSv1.3");
-        properties.put("mail.smtp.socketFactory.port", "465");
-        properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        properties.put("mail.smtp.connectiontimeout", "8000");
-        properties.put("mail.smtp.timeout", "8000");
+        properties.put("mail.smtp.starttls.enable", "true");
 
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SENDER_EMAIL, APP_PASSWORD);
+                // Using Brevo Login ID and Key
+                return new PasswordAuthentication(BREVO_LOGIN_ID, BREVO_SMTP_KEY);
             }
         });
 

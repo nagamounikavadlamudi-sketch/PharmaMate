@@ -8,12 +8,14 @@ import javax.mail.internet.*;
 
 public class RegisterServlet extends HttpServlet {
 
+    // 1. Mee verified sender email (Brevo lo account create chesina email)
     private static final String SENDER_EMAIL = "nagamounikavadlamudi@gmail.com";
     
-    private static final String APP_PASSWORD = 
-        (System.getenv("PHARMAMATE_EMAIL_PASSWORD") != null) 
-            ? System.getenv("PHARMAMATE_EMAIL_PASSWORD") 
-            : "mizimlhpwtonrwqw"; // <-- PUT YOUR 16-LETTER PASSWORD HERE
+    // 2. Screenshot lo unna mee Brevo Login ID
+    private static final String BREVO_LOGIN_ID = "b9ede4001@smtp-brevo.com"; 
+    
+    // 3. Ippudu generate chesina kotha SMTP key ikkada paste cheyandi (Quotes madhyalo)
+    private static final String BREVO_SMTP_KEY = "xsmtpsib-c383c552291357d8550f4fe6302f31bea172ccf811aac393827b1929718dcd8f-SeycEO3PrtGqyvTc"; 
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -37,7 +39,6 @@ public class RegisterServlet extends HttpServlet {
                     + "password VARCHAR(100) NOT NULL)";
             
             try (Statement stmt = con.createStatement()) {
-                // The DROP TABLE line has been removed from here!
                 stmt.execute(createTable);
             }
 
@@ -50,32 +51,44 @@ public class RegisterServlet extends HttpServlet {
                 ps.executeUpdate();
             }
 
-            // Send confirmation email
-            sendWelcomeEmail(email, username, password);
+            // FAST FIX: Email ni background thread lo run chesthunnam
+            final String finalEmail = email;
+            final String finalUser = username;
+            final String finalPass = password;
             
-            // Redirect to login page on success
+            new Thread(() -> {
+                try {
+                    sendWelcomeEmail(finalEmail, finalUser, finalPass);
+                    System.out.println("Welcome email sent successfully to: " + finalEmail);
+                } catch (Exception e) {
+                    System.out.println("Welcome email failed: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }).start();
+            
+            // Ventane login page ki redirect ayipothundi!
             response.sendRedirect("index.html");
 
         } catch (SQLIntegrityConstraintViolationException e) {
             response.getWriter().println("<html><body><h3>Error: That email is already registered.</h3><a href='register.html'>Try again</a></body></html>");
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().println("Database or Email Error: " + e.getMessage());
+            response.getWriter().println("Database Error: " + e.getMessage());
         }
     }
 
     private void sendWelcomeEmail(String toEmail, String user, String pass) throws Exception {
         Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com");
+        
+        // BREVO PORT 2525 SETTINGS
+        props.put("mail.smtp.host", "smtp-relay.brevo.com");
+        props.put("mail.smtp.port", "2525");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.smtp.ssl.enable", "true");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.starttls.enable", "true");
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SENDER_EMAIL, APP_PASSWORD);
+                return new PasswordAuthentication(BREVO_LOGIN_ID, BREVO_SMTP_KEY);
             }
         });
 
