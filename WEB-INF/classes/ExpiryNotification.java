@@ -14,7 +14,6 @@ import javax.mail.internet.*;
 public class ExpiryNotification extends HttpServlet {
 
     private static final String SENDER_EMAIL = "nagamounikavadlamudi@gmail.com";
-    // REPLACE THIS WITH YOUR NEW GOOGLE APP PASSWORD (No spaces)
     private static final String APP_PASSWORD = "mizimlhpwtonrwqw"; 
 
     @Override
@@ -44,9 +43,19 @@ public class ExpiryNotification extends HttpServlet {
         try {
             con = DBConnection.getConnection();
             
-            // =========================================================
-            // Automatically create the table in the correct database
-            // =========================================================
+            // 1. Fetch employee emails ONCE to save time
+            List<String> employeeEmails = new ArrayList<>();
+            try (PreparedStatement emailStmt = con.prepareStatement("SELECT email FROM users");
+                 ResultSet emailRs = emailStmt.executeQuery()) {
+                while (emailRs.next()) {
+                    String email = emailRs.getString("email");
+                    if (email != null && !email.trim().isEmpty()) {
+                        employeeEmails.add(email);
+                    }
+                }
+            }
+
+            // 2. Automatically create the table in the correct database
             String createTableSQL = "CREATE TABLE IF NOT EXISTS expiry_notifications ("
                     + "id INT AUTO_INCREMENT PRIMARY KEY, "
                     + "medicine_id INT NOT NULL, "
@@ -56,8 +65,8 @@ public class ExpiryNotification extends HttpServlet {
             try (Statement stmt = con.createStatement()) {
                 stmt.execute(createTableSQL);
             }
-            // =========================================================
 
+            // 3. Find expiring medicines
             String query = "SELECT id, name, expiry_date FROM medicines";
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
@@ -111,14 +120,22 @@ public class ExpiryNotification extends HttpServlet {
                     out.println("<strong>" + displayTitle + "</strong>");
 
                     if (!isAlreadySent(con, medicineId, notificationType)) {
-                        try {
-                            // Passed the database connection so the method can fetch all users
-                            sendExpiryEmail(con, medicineName, expiry, notificationType);
-                            markAsSent(con, medicineId, notificationType);
-                            out.println("<p style='color:green;margin:5px 0 0 0;'>&#10003; Alert email dispatched to all employees.</p>");
-                        } catch (Exception mailError) {
-                            out.println("<p style='color:red;margin:5px 0 0 0;'>Mail delivery failed: " + mailError.getMessage() + "</p>");
-                        }
+                        
+                        // THIS IS THE FIX: Run email in a Background Thread!
+                        final String finalMedName = medicineName;
+                        final String finalExpiry = expiry;
+                        final String finalType = notificationType;
+                        
+                        new Thread(() -> {
+                            try {
+                                sendExpiryEmail(employeeEmails, finalMedName, finalExpiry, finalType);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+
+                        markAsSent(con, medicineId, notificationType);
+                        out.println("<p style='color:green;margin:5px 0 0 0;'>&#10003; Alert email is sending in the background.</p>");
                     } else {
                         out.println("<p style='color:gray;margin:5px 0 0 0;'>Notification already recorded as sent.</p>");
                     }
@@ -163,24 +180,8 @@ public class ExpiryNotification extends HttpServlet {
         }
     }
 
-    private void sendExpiryEmail(Connection con, String medicineName, String expiry, String type) throws Exception {
-        List<String> employeeEmails = new ArrayList<>();
-
-        // Fetch all user emails from the database
-        String emailQuery = "SELECT email FROM users";
-        try (PreparedStatement psEmails = con.prepareStatement(emailQuery);
-             ResultSet rsEmails = psEmails.executeQuery()) {
-            while (rsEmails.next()) {
-                String email = rsEmails.getString("email");
-                if (email != null && !email.trim().isEmpty()) {
-                    employeeEmails.add(email);
-                }
-            }
-        }
-
-        if (employeeEmails.isEmpty()) {
-            throw new Exception("No registered employees found in the database to receive this email.");
-        }
+    private void sendExpiryEmail(List<String> employeeEmails, String medicineName, String expiry, String type) throws Exception {
+        if (employeeEmails.isEmpty()) return;
 
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
@@ -200,7 +201,6 @@ public class ExpiryNotification extends HttpServlet {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(SENDER_EMAIL, "PharmaMate Alerts"));
         
-        // Add all employees to the BCC field so they don't see each other's emails
         for (String email : employeeEmails) {
             message.addRecipient(Message.RecipientType.BCC, new InternetAddress(email));
         }
@@ -211,27 +211,15 @@ public class ExpiryNotification extends HttpServlet {
         switch (type) {
             case "SIX_MONTHS":
                 subject = "PharmaMate - Medicine Expiry in 6 Months";
-                body = "Hello Team,\n\nMedicine Expiry Alert from PharmaMate.\n\n"
-                     + "Medicine: " + medicineName + "\n"
-                     + "Expiry Period: " + expiry + "\n\n"
-                     + "This medicine will expire in approximately 6 months. Please audit your stock.\n\n"
-                     + "Regards,\nPharmaMate Team";
+                body = "Hello Team,\n\nMedicine Expiry Alert from PharmaMate.\n\nMedicine: " + medicineName + "\nExpiry Period: " + expiry + "\n\nThis medicine will expire in approximately 6 months. Please audit your stock.\n\nRegards,\nPharmaMate Team";
                 break;
             case "ONE_MONTH":
                 subject = "URGENT: PharmaMate - Medicine Expiry in 1 Month";
-                body = "Hello Team,\n\nMedicine Expiry Alert from PharmaMate.\n\n"
-                     + "Medicine: " + medicineName + "\n"
-                     + "Expiry Period: " + expiry + "\n\n"
-                     + "This medicine will expire within 1 month. Plan usage or replacement immediately.\n\n"
-                     + "Regards,\nPharmaMate Team";
+                body = "Hello Team,\n\nMedicine Expiry Alert from PharmaMate.\n\nMedicine: " + medicineName + "\nExpiry Period: " + expiry + "\n\nThis medicine will expire within 1 month. Plan usage or replacement immediately.\n\nRegards,\nPharmaMate Team";
                 break;
             default:
                 subject = "CRITICAL: PharmaMate - Medicine Expired";
-                body = "Hello Team,\n\nCRITICAL ALERT from PharmaMate.\n\n"
-                     + "Medicine: " + medicineName + "\n"
-                     + "Expiry Period: " + expiry + "\n\n"
-                     + "This medicine has EXPIRED. Please immediately discard or remove it from circulation.\n\n"
-                     + "Regards,\nPharmaMate Team";
+                body = "Hello Team,\n\nCRITICAL ALERT from PharmaMate.\n\nMedicine: " + medicineName + "\nExpiry Period: " + expiry + "\n\nThis medicine has EXPIRED. Please immediately discard or remove it from circulation.\n\nRegards,\nPharmaMate Team";
                 break;
         }
 
